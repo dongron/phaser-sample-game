@@ -1,4 +1,5 @@
 function create() {
+  this.add.image(400, 300, 'sky');
   player = this.add.sprite(100, 200, 'player');
   this.physics.arcade.enable(player);
   player.body.collideWorldBounds = true;
