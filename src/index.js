@@ -1,32 +1,21 @@
-import Phaser from "phaser";
-import logoImg from "./assets/logo.png";
+import Phaser from 'phaser';
+import { gameConfig } from './config';
+import assets from './assets';
+import { preload } from './scene/preload';
+import { buildCreate } from './scene/create';
+import { buildUpdate } from './scene/update';
+import { buildRender } from './scene/render';
 
-const config = {
-  type: Phaser.AUTO,
-  parent: "phaser-example",
-  width: 800,
-  height: 600,
-  scene: {
-    preload: preload,
-    create: create
-  }
+let player;
+let platforms;
+let cursors;
+let jumpButton;
+
+const scene = {
+  preload,
+  create: buildCreate({ player, platforms, cursors, jumpButton }),
+  update: buildUpdate({ game, player, jumpButton }),
+  render: buildRender()
 };
 
-const game = new Phaser.Game(config);
-
-function preload() {
-  this.load.image("logo", logoImg);
-}
-
-function create() {
-  const logo = this.add.image(400, 150, "logo");
-
-  this.tweens.add({
-    targets: logo,
-    y: 450,
-    duration: 2000,
-    ease: "Power2",
-    yoyo: true,
-    loop: -1
-  });
-}
+const game = new Phaser.Game({ ...gameConfig(), scene });
