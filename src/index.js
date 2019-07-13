@@ -14,7 +14,7 @@ let jumpButton;
 const scene = {
   preload,
   create: buildCreate({ player, platforms, cursors, jumpButton }),
-  update: buildUpdate({ game, player, jumpButton }),
+  // update: buildUpdate({ game, player, jumpButton }),
   render: buildRender()
 };
 
