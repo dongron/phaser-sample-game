@@ -4,6 +4,7 @@ function create() {
   createBackground(this);
   createPlatforms(this);
   createPlayer(this);
+  setColliders(this);
 
   // cursors = game.input.keyboard.createCursorKeys();
   // jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
@@ -58,6 +59,10 @@ const createPlayer = that => {
   // that.physics.arcade.enable(player);
   // player.body.collideWorldBounds = true;
   // player.body.gravity.y = 500;
+};
+
+const setColliders = that => {
+  that.physics.add.collider(player, platforms);
 };
 
 function buildCreate({
