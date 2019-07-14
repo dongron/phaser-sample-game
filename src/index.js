@@ -6,15 +6,13 @@ import { buildCreate } from './scene/create';
 import { buildUpdate } from './scene/update';
 import { buildRender } from './scene/render';
 
-let player;
-let platforms;
 let cursors;
 let jumpButton;
 
 const scene = {
   preload,
-  create: buildCreate({ player, platforms, cursors, jumpButton }),
-  // update: buildUpdate({ game, player, jumpButton }),
+  create: buildCreate({}),
+  update: buildUpdate({ game, jumpButton }),
   render: buildRender()
 };
 

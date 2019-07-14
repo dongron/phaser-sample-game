@@ -1,20 +1,25 @@
-let player, platforms, cursors, jumpButton;
+import {
+  platforms,
+  player,
+  updatePlatforms,
+  updatePlayer
+} from '../game/objects';
 
 function create() {
   createBackground(this);
-  createPlatforms(this);
-  createPlayer(this);
-  setColliders(this);
+  let _platforms = createPlatforms({ that: this, platforms });
+  let _player = createPlayer({ that: this, player });
+  setColliders({ that: this, player: _player, platforms: _platforms });
 
-  // cursors = game.input.keyboard.createCursorKeys();
-  // jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+  updatePlatforms(_platforms);
+  updatePlayer(_player);
 }
 
 const createBackground = that => {
   that.add.image(400, 300, 'sky');
 };
 
-const createPlatforms = that => {
+const createPlatforms = ({ that, platforms }) => {
   platforms = that.physics.add.staticGroup();
   platforms
     .create(400, 568, 'platform')
@@ -23,15 +28,16 @@ const createPlatforms = that => {
   platforms.create(600, 400, 'platform');
   platforms.create(50, 250, 'platform');
   platforms.create(750, 220, 'platform');
+  return platforms;
 };
 
-const createPlayer = that => {
+const createPlayer = ({ that, player }) => {
   player = that.physics.add.sprite(100, 100, 'player-simple');
   player.setBounce(0.2);
   player.setCollideWorldBounds(true);
 
   //todo: fix player sprite
-  return;
+  return player;
   that.anims.create({
     key: 'left',
     frames: that.anims.generateFrameNumbers('player-sprite', {
@@ -55,26 +61,13 @@ const createPlayer = that => {
     frameRate: 10,
     repeat: -1
   });
-
-  // that.physics.arcade.enable(player);
-  // player.body.collideWorldBounds = true;
-  // player.body.gravity.y = 500;
 };
 
-const setColliders = that => {
+const setColliders = ({ that, player, platforms }) => {
   that.physics.add.collider(player, platforms);
 };
 
-function buildCreate({
-  player: _player,
-  platforms: _platforms,
-  cursors: _cursors,
-  jumpButton: _jumpButton
-} = {}) {
-  player = _player;
-  platforms = _platforms;
-  cursors = _cursors;
-  jumpButton = _jumpButton;
+function buildCreate({}) {
   return create;
 }
 
