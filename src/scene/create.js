@@ -1,6 +1,7 @@
 import {
   platforms,
   player,
+  stars,
   updatePlatforms,
   updatePlayer
 } from '../game/objects';
@@ -9,7 +10,14 @@ function create() {
   createBackground(this);
   let _platforms = createPlatforms({ that: this, platforms });
   let _player = createPlayer({ that: this, player });
-  setColliders({ that: this, player: _player, platforms: _platforms });
+  let _stars = createStars({ that: this, stars });
+  setColliders({
+    that: this,
+    player: _player,
+    platforms: _platforms,
+    stars: _stars
+  });
+  setOverlaps({ that: this, player: _player, stars: _stars });
 
   updatePlatforms(_platforms);
   updatePlayer(_player);
@@ -63,8 +71,31 @@ const createPlayer = ({ that, player }) => {
   });
 };
 
-const setColliders = ({ that, player, platforms }) => {
+const createStars = ({ that, stars }) => {
+  stars = that.physics.add.group({
+    key: 'logo',
+    repeat: 11,
+    setXY: { x: 12, y: 0, stepX: 70 },
+    setScale: { x: 0.2, y: 0.2 }
+  });
+  stars.children.iterate(function(child) {
+    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+  });
+  return stars;
+};
+
+const setColliders = ({ that, player, platforms, stars }) => {
   that.physics.add.collider(player, platforms);
+  that.physics.add.collider(stars, platforms);
+};
+
+const setOverlaps = ({ that, player, stars }) => {
+  that.physics.add.overlap(player, stars, collectStar, null, that);
+
+  function collectStar (player, star) {
+    console.warn('touch');
+    star.disableBody(true, true);
+  };
 };
 
 function buildCreate({}) {
