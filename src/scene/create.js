@@ -3,21 +3,30 @@ import {
   player,
   stars,
   updatePlatforms,
-  updatePlayer
+  updatePlayer,
+  scoreText
 } from '../game/objects';
+import { score } from '../game/gameplay';
 
 function create() {
   createBackground(this);
   let _platforms = createPlatforms({ that: this, platforms });
   let _player = createPlayer({ that: this, player });
   let _stars = createStars({ that: this, stars });
+  let _scoreText = createScoreText({ that: this, scoreText });
   setColliders({
     that: this,
     player: _player,
     platforms: _platforms,
     stars: _stars
   });
-  setOverlaps({ that: this, player: _player, stars: _stars });
+  setOverlaps({
+    that: this,
+    player: _player,
+    stars: _stars,
+    scoreText: _scoreText,
+    score
+  });
 
   updatePlatforms(_platforms);
   updatePlayer(_player);
@@ -89,13 +98,22 @@ const setColliders = ({ that, player, platforms, stars }) => {
   that.physics.add.collider(stars, platforms);
 };
 
-const setOverlaps = ({ that, player, stars }) => {
+const setOverlaps = ({ that, player, stars, score, scoreText }) => {
   that.physics.add.overlap(player, stars, collectStar, null, that);
 
-  function collectStar (player, star) {
-    console.warn('touch');
+  function collectStar(player, star) {
+    score += 1;
+    scoreText.setText('Score: ' + score);
     star.disableBody(true, true);
-  };
+  }
+};
+
+const createScoreText = ({ that, scoreText }) => {
+  scoreText = that.add.text(16, 16, 'Score: 0', {
+    fontSize: '32px',
+    fill: '#000'
+  });
+  return scoreText;
 };
 
 function buildCreate({}) {
