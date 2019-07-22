@@ -4,9 +4,10 @@ import {
   stars,
   updatePlatforms,
   updatePlayer,
-  scoreText
+  scoreText,
+  bombs
 } from '../game/objects';
-import { score } from '../game/gameplay';
+import { score, gameOver, setGameOver } from '../game/gameplay';
 
 function create() {
   createBackground(this);
@@ -14,17 +15,21 @@ function create() {
   let _player = createPlayer({ that: this, player });
   let _stars = createStars({ that: this, stars });
   let _scoreText = createScoreText({ that: this, scoreText });
+  let _bombs = createBombs({ that: this, bombs });
   setColliders({
     that: this,
     player: _player,
     platforms: _platforms,
-    stars: _stars
+    stars: _stars,
+    bombs: _bombs,
+    setGameOver
   });
   setOverlaps({
     that: this,
     player: _player,
     stars: _stars,
     scoreText: _scoreText,
+    bombs: _bombs,
     score
   });
 
@@ -93,18 +98,53 @@ const createStars = ({ that, stars }) => {
   return stars;
 };
 
-const setColliders = ({ that, player, platforms, stars }) => {
+const setColliders = ({
+  that,
+  player,
+  platforms,
+  stars,
+  bombs,
+  setGameOver
+}) => {
   that.physics.add.collider(player, platforms);
   that.physics.add.collider(stars, platforms);
+  that.physics.add.collider(bombs, platforms);
+  that.physics.add.collider(player, bombs, hitBomb, null, that);
+
+  function hitBomb() {
+    that.physics.pause();
+    player.setTint(0xff0000);
+    // player.anims.play('turn');
+    setGameOver({ value: true, that });
+  }
 };
 
-const setOverlaps = ({ that, player, stars, score, scoreText }) => {
+const setOverlaps = ({ that, player, stars, score, scoreText, bombs }) => {
   that.physics.add.overlap(player, stars, collectStar, null, that);
 
   function collectStar(player, star) {
     score += 1;
     scoreText.setText('Score: ' + score);
     star.disableBody(true, true);
+    realeaseBomb();
+  }
+
+  function realeaseBomb() {
+    if (stars.countActive(true) === 0) {
+      stars.children.iterate(function(child) {
+        child.enableBody(true, child.x, 0, true, true);
+      });
+
+      let x =
+        player.x < 400
+          ? Phaser.Math.Between(400, 800)
+          : Phaser.Math.Between(0, 400);
+
+      let bomb = bombs.create(x, 16, 'asteroid');
+      bomb.setBounce(1);
+      bomb.setCollideWorldBounds(true);
+      bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    }
   }
 };
 
@@ -114,6 +154,11 @@ const createScoreText = ({ that, scoreText }) => {
     fill: '#000'
   });
   return scoreText;
+};
+
+const createBombs = ({ that, bombs }) => {
+  bombs = that.physics.add.group();
+  return bombs;
 };
 
 function buildCreate({}) {

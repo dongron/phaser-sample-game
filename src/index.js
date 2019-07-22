@@ -5,9 +5,11 @@ import { preload } from './scene/preload';
 import { buildCreate } from './scene/create';
 import { buildUpdate } from './scene/update';
 import { buildRender } from './scene/render';
+import { gameOver, setGameOver } from './game/gameplay';
 
 let cursors;
 let jumpButton;
+let game, that;
 
 const scene = {
   preload,
@@ -16,4 +18,7 @@ const scene = {
   render: buildRender()
 };
 
-const game = new Phaser.Game({ ...gameConfig(), scene });
+function initGame() {
+  game = new Phaser.Game({ ...gameConfig(), scene }) || {};
+}
+initGame();
